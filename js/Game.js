@@ -40,6 +40,7 @@ class Game {
 
     fuels = new Group();
     powerCoins = new Group();
+    obstacles=new Group();
 
     var obstaclesPositions = [
       { x: width / 2 + 250, y: height - 800, image: obstacle2Image },
@@ -61,14 +62,26 @@ class Game {
 
     // Adding coin sprite in the game
     this.addSprites(powerCoins, 18, powerCoinImage, 0.09);
+
+    //adding obstacle sprites in the game
+   this.addSprites(obstacles,obstaclesPositions.length,obstacle1Image,0.04,obstaclesPositions);
+   //this.addSprites(obstacles,obstaclesPositions.length,obstacle1Image,0.04,obstaclesPositions);
   }
 
-  addSprites(spriteGroup, numberOfSprites, spriteImage, scale) {
+  
+
+  addSprites(spriteGroup, numberOfSprites, spriteImage, scale,positions=[]) {
     for (var i = 0; i < numberOfSprites; i++) {
       var x, y;
-
+      if(positions.length>0){
+        x = positions[i].x;
+        y = positions[i].y;
+        spriteImage=positions[i].image;
+      }
+        else{
       x = random(width / 2 + 150, width / 2 - 150);
       y = random(-height * 4.5, height - 400);
+    }
 
       var sprite = createSprite(x, y);
       sprite.addImage("sprite", spriteImage);
@@ -76,6 +89,7 @@ class Game {
       sprite.scale = scale;
       spriteGroup.add(sprite);
     }
+  
   }
 
   handleElements() {
@@ -131,8 +145,12 @@ class Game {
           fill("red");
           ellipse(x, y, 60, 60);
 
+   this.handleFuel(index);
+  this.handlePowerCoins(index);
+
           // Changing camera position in y direction
           camera.position.y = cars[index - 1].position.y;
+
         }
       }
 
@@ -212,5 +230,26 @@ class Game {
       player.positionX += 5;
       player.update();
     }
+  }
+
+  handleFuel(index){
+    //adding fuel
+    cars[index-1].overlap(fuels,function(collector,collected){
+      player.fuel=185;
+      //collected is the sprite in the group that triggered the event
+      collected.remove();
+    })
+
+  }
+
+  handlePowerCoins(index){
+    //adding powercoins
+    cars[index-1].overlap(powerCoins,function(collector,collected){
+      player.score+=21;
+      player.update();
+      //collected is the sprite in the group that triggered the event
+      collected.remove();
+    })
+
   }
 }
